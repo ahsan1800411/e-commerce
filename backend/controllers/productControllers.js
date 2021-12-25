@@ -1,4 +1,5 @@
 const Product = require('../models/product');
+const ErrorHandler = require('../utils/errorHandler');
 
 // create a new product >> /api/v1/admin/product/new  >> POST REQUEST;
 
@@ -23,12 +24,10 @@ exports.allProducts = async (req, res, next) => {
 // get single product >> /api/v1/product/:id >> GET REQUEST;
 exports.getSingleProduct = async (req, res, next) => {
   const product = await Product.findById(req.params.id);
-  if (!product) {
-    return res.status(400).json({
-      success: false,
-      message: 'Product not found',
-    });
-  }
+  if (!product)
+    return next(
+      new ErrorHandler(`Product not found with id ${req.params.id}`, 400)
+    );
   res.json({
     success: true,
     product,
@@ -39,12 +38,10 @@ exports.getSingleProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
   let product = await Product.findById(req.params.id);
-  if (!product) {
-    return res.status(400).json({
-      success: false,
-      message: 'Product not found',
-    });
-  }
+  if (!product)
+    return next(
+      new ErrorHandler(`Product not found with id ${req.params.id}`, 400)
+    );
 
   product = await Product.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -61,12 +58,10 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.deleteProduct = async (req, res, next) => {
   const product = await Product.findById(req.params.id);
-  if (!product) {
-    return res.status(400).json({
-      success: false,
-      message: 'Product not found',
-    });
-  }
+  if (!product)
+    return next(
+      new ErrorHandler(`Product not found with id ${req.params.id}`, 400)
+    );
   await product.remove();
   res.json({ success: true, message: 'Product deleted' });
 };
