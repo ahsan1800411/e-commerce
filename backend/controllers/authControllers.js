@@ -3,6 +3,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
+const JWT = require('jsonwebtoken');
 
 // register User ==> Post Request >> /api/v1/register;
 
@@ -32,5 +33,36 @@ exports.register = catchAsyncErrors(async (req, res, next) => {
     },
   });
 
-  res.json({ success: true, newUser });
+  // Assign a token to the user
+  const token = JWT.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    expiresIn: 360000,
+  });
+
+  res.json({ success: true, token });
+});
+
+//  login user >> Post request >> /api/v1/login
+
+exports.login = catchAsyncErrors(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    return next(new ErrorHandler('Please fill all the credentials', 400));
+
+  // check if the user exist in the database or not
+  const user = await User.findOne({ email }).select('+password');
+
+  if (!user) return next(new ErrorHandler('User not found', 400));
+
+  // compare the password ;
+  const matchPassword = await bcrypt.compare(password, user.password);
+  if (!matchPassword)
+    return next(new ErrorHandler("Password doe'nt match", 400));
+
+  //  Assign a token to the user
+  const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: 360000,
+  });
+
+  res.json({ success: true, token });
 });
