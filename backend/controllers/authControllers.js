@@ -3,7 +3,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
-const JWT = require('jsonwebtoken');
+const sendToken = require('../utils/jwtToken');
 
 // register User ==> Post Request >> /api/v1/register;
 
@@ -33,12 +33,7 @@ exports.register = catchAsyncErrors(async (req, res, next) => {
     },
   });
 
-  // Assign a token to the user
-  const token = JWT.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-    expiresIn: 360000,
-  });
-
-  res.json({ success: true, token });
+  sendToken(newUser, 201, res);
 });
 
 //  login user >> Post request >> /api/v1/login
@@ -59,10 +54,5 @@ exports.login = catchAsyncErrors(async (req, res, next) => {
   if (!matchPassword)
     return next(new ErrorHandler("Password doe'nt match", 400));
 
-  //  Assign a token to the user
-  const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: 360000,
-  });
-
-  res.json({ success: true, token });
+  sendToken(user, 200, res);
 });
