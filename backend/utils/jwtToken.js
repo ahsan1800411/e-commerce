@@ -4,7 +4,7 @@ const JWT = require('jsonwebtoken');
 const sendToken = (user, statusCode, res) => {
   //  Assign a token to the user
   const token = JWT.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: 360000,
+    expiresIn: process.env.JWT_EXPIRES_TIME,
   });
 
   //   options for cookies;
