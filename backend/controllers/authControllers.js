@@ -22,13 +22,10 @@ exports.register = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  // Encrypting a password;
-  const hashPassword = await bcrypt.hash(password, 10);
-
   let newUser = await User.create({
     name,
     email,
-    password: hashPassword,
+    password,
     avatar: {
       public_id: 'Hi, There',
       url: 'https://hfmfnhfngmg',
@@ -140,6 +137,38 @@ exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// update/change password ==> put request >>/api/v1/password/update
+exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select('+password');
+
+  //  checks previous user password;
+  const isMatched = await bcrypt.compare(req.body.oldPassword, user.password);
+  if (!isMatched) {
+    return next(new ErrorHandler("Old password doesn't match'", 400));
+  }
+  user.password = req.body.password;
+  await user.save();
+  sendToken(user, 200, res);
+});
+
+// update user profile ==> /api/v1/me/update >> put request ;
+exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+
+  await User.findByIdAndUpdate(req.user.id, newUserData, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+  res.json({
+    success: true,
+    message: 'Updated user successfully',
+  });
+});
+
 // logout user >>> get Request >>> /api/v1/logout;
 
 exports.logout = catchAsyncErrors(async (req, res, next) => {
@@ -151,5 +180,26 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
   res.json({
     success: true,
     message: 'Logged out',
+  });
+});
+
+// admin routes ==> get all users ==> /api/v1/admin/users >> get request
+exports.getAllUsers = catchAsyncErrors(async (req, res, next) => {
+  const users = await User.find();
+  res.json({
+    success: true,
+    users,
+  });
+});
+
+// get user details ==> get request >>> /api/admin/user/:id;
+
+exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return next(new ErrorHandler('User not found', 400));
+
+  res.json({
+    success: true,
+    user,
   });
 });
