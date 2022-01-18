@@ -1,4 +1,5 @@
 const Order = require('../models/order');
+const Product = require('../models/product');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
@@ -74,4 +75,40 @@ exports.getAdminAllOrders = catchAsyncErrors(async (req, res, next) => {
     totalAmount,
     orders,
   });
+});
+
+// update/process order >> admin route -=>> put request   ==> /api/v1/admin/order/:id;
+exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order.orderStatus === 'Delivered') {
+    return next(new ErrorHandler('You have already delivered this order', 400));
+  }
+
+  order.orderItems.forEach(async (item) => {
+    await updateStock(item.product, item.quantity);
+  });
+
+  // now changing the status of the order: ;
+
+  order.orderStatus = req.body.orderStatus;
+  order.deliveredAt = Date.now();
+  await order.save();
+  res.json({ success: true });
+});
+
+async function updateStock(id, quantity) {
+  const product = await Product.findById(id);
+  product.stock = product.stock - quantity;
+  await product.save({ validateBeforeSave: false });
+}
+
+// delete order >> admin route -=>> delete request ==> /api/v1/admin/order/:id;
+exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return next(new ErrorHandler('Order not found', 400));
+  }
+  await order.remove();
+  res.json({ success: true, message: 'Order successfully deleted' });
 });
