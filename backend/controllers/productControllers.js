@@ -111,3 +111,35 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
+
+// get all product reviews => /api/v1/reviews;  ==> get request;
+exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
+  const product = await Product.findById(req.query.id);
+  res.json({ success: true, reviews: product.reviews });
+});
+
+// delete Reviews  ==> /api/v1/reviews;   ==> delete reviews;
+exports.deleteReviews = catchAsyncErrors(async (req, res, next) => {
+  const product = await Product.findById(req.query.productId);
+
+  const reviews = product.reviews.filter(
+    (review) => review._id.toString() !== req.query.id.toString()
+  );
+
+  const numOfReviews = reviews.length;
+
+  const ratings =
+    product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+    reviews.length;
+
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    { reviews, numOfReviews, ratings },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    }
+  );
+  res.json({ success: true });
+});
