@@ -16,11 +16,19 @@ const Range = createSliderWithTooltip(Slider.Range);
 const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [price, setPrice] = useState([1, 1000]);
+  const [category, setCategory] = useState('');
+  const [rating, setRating] = useState(0);
+
   const { keyword } = useParams();
   const dispatch = useDispatch();
-  const { products, loading, error, resPerPage, productsCount } = useSelector(
-    (state) => state.products
-  );
+  const {
+    products,
+    loading,
+    error,
+    resPerPage,
+    productsCount,
+    filteredProductsCount,
+  } = useSelector((state) => state.products);
 
   const alert = useAlert();
 
@@ -28,12 +36,30 @@ const Home = () => {
     if (error) {
       return alert.error(error);
     }
-
-    dispatch(getProducts(keyword, currentPage, price));
-  }, [dispatch, error, alert, keyword, currentPage, price]);
+    dispatch(getProducts(keyword, currentPage, price, category, rating));
+  }, [dispatch, error, alert, keyword, currentPage, price, category, rating]);
 
   function setCurrentPageNo(pageNumber) {
     setCurrentPage(pageNumber);
+  }
+
+  const categories = [
+    'Electronics',
+    'Cameras',
+    'Laptops',
+    'Accessories',
+    'Headphones',
+    'Food',
+    'Books',
+    'Clothes/Shoes',
+    'Beauty/Health',
+    'Sports',
+    'Outdoor',
+    'Home',
+  ];
+  let count = productsCount;
+  if (keyword) {
+    count = filteredProductsCount;
   }
 
   return (
@@ -67,6 +93,48 @@ const Home = () => {
                         value={price}
                         onChange={(price) => setPrice(price)}
                       />
+                      <hr className='my-5' />
+                      <div className='mt-5'>
+                        <h4 className='mb-3'>Categories</h4>
+                        <ul className='pl-0'>
+                          {categories.map((category) => (
+                            <li
+                              key={category}
+                              style={{
+                                cursor: 'pointer',
+                                listStyleType: 'none',
+                              }}
+                              onClick={() => setCategory(category)}
+                            >
+                              {category}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <hr className='my-3' />
+                      <div className='mt-5'>
+                        <h4 className='mb-3'>Ratings</h4>
+                        <ul className='pl-0'>
+                          {[5, 4, 3, 2, 1].map((star) => (
+                            <li
+                              className='category-li'
+                              key={star}
+                              style={{
+                                cursor: 'pointer',
+                                listStyleType: 'none',
+                              }}
+                              onClick={() => setRating(star)}
+                            >
+                              <div className='rating-outer'>
+                                <div
+                                  className='rating-inner'
+                                  style={{ width: `${star * 20}%` }}
+                                ></div>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
                   <div className='col-6 col-md-9'>
@@ -90,7 +158,7 @@ const Home = () => {
               )}
             </div>
           </section>
-          {resPerPage <= productsCount && (
+          {resPerPage <= count && (
             <div className='d-flex justify-content-center mt-5'>
               <Pagination
                 activePage={currentPage}
