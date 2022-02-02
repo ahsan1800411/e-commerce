@@ -6,8 +6,15 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ProductDetails from './components/layouts/product/productDetails';
 import Login from './components/user/Login';
 import Register from './components/user/Register';
+import store from './store';
+import { useEffect } from 'react';
+import { loadUser } from './actions/userActions';
 
 function App() {
+  useEffect(() => {
+    store.dispatch(loadUser());
+  }, []);
+
   return (
     <BrowserRouter>
       <div className='App'>

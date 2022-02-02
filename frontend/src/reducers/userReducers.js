@@ -6,12 +6,18 @@ import {
   REGISTER_SUCCESS,
   REGISTER_ERROR,
   REGISTER_REQUEST,
+  LOAD_REQUEST,
+  LOAD_SUCCESS,
+  LOAD_ERROR,
+  LOGOUT_SUCCESS,
+  LOGOUT_ERROR,
 } from './../constants/userConstants';
 
 export const authReducer = (state = { user: {} }, action) => {
   switch (action.type) {
     case LOGIN_REQUEST:
     case REGISTER_REQUEST:
+    case LOAD_REQUEST:
       return {
         ...state,
         loading: true,
@@ -19,14 +25,27 @@ export const authReducer = (state = { user: {} }, action) => {
       };
     case LOGIN_SUCCESS:
     case REGISTER_SUCCESS:
+    case LOAD_SUCCESS:
       return {
         ...state,
         loading: false,
         isAuthenticated: true,
         user: action.payload,
       };
+    case LOGOUT_SUCCESS:
+      return {
+        loading: false,
+        isAuthenticated: false,
+        user: null,
+      };
+    case LOGOUT_ERROR:
+      return {
+        ...state,
+        error: action.payload,
+      };
     case LOGIN_ERROR:
     case REGISTER_ERROR:
+    case LOAD_ERROR:
       return {
         ...state,
         loading: false,

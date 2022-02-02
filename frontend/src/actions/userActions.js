@@ -6,6 +6,11 @@ import {
   REGISTER_SUCCESS,
   REGISTER_ERROR,
   REGISTER_REQUEST,
+  LOAD_ERROR,
+  LOAD_REQUEST,
+  LOAD_SUCCESS,
+  LOGOUT_ERROR,
+  LOGOUT_SUCCESS,
 } from './../constants/userConstants';
 import axios from 'axios';
 
@@ -42,6 +47,26 @@ export const register = (userData) => async (dispatch) => {
     dispatch({ type: REGISTER_SUCCESS, payload: data.user });
   } catch (error) {
     dispatch({ type: REGISTER_ERROR, payload: error.response.data.message });
+  }
+};
+
+export const loadUser = () => async (dispatch) => {
+  try {
+    dispatch({ type: LOAD_REQUEST });
+
+    const { data } = await axios('/api/v1/me');
+    dispatch({ type: LOAD_SUCCESS, payload: data.user });
+  } catch (error) {
+    dispatch({ type: LOAD_ERROR, payload: error.response.data.message });
+  }
+};
+
+export const logoutUser = () => async (dispatch) => {
+  try {
+    await axios('/api/v1/logout');
+    dispatch({ type: LOGOUT_SUCCESS });
+  } catch (error) {
+    dispatch({ type: LOGOUT_ERROR, payload: error.response.data.message });
   }
 };
 
