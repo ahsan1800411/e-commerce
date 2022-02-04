@@ -9,6 +9,9 @@ import Register from './components/user/Register';
 import store from './store';
 import { useEffect } from 'react';
 import { loadUser } from './actions/userActions';
+import Profile from './components/user/Profile';
+import ProtectedRoutes from './components/route/ProtectedRoutes';
+import ErrorPage from './components/ErrorPage';
 
 function App() {
   useEffect(() => {
@@ -22,10 +25,20 @@ function App() {
         <div className='container container-fluid'>
           <Routes>
             <Route path='/' element={<Home />} />
+            <Route
+              path='/me'
+              element={
+                <ProtectedRoutes>
+                  <Profile />
+                </ProtectedRoutes>
+              }
+            />
+
             <Route path='login' element={<Login />} />
             <Route path='register' element={<Register />} />
             <Route path='/search/:keyword' element={<Home />} />
             <Route path='/product/:id' element={<ProductDetails />} />
+            <Route path='*' element={<ErrorPage />} />
           </Routes>
         </div>
 

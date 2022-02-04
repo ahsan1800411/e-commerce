@@ -11,6 +11,10 @@ import {
   LOAD_ERROR,
   LOGOUT_SUCCESS,
   LOGOUT_ERROR,
+  UPDATE_PROFILE_REQUEST,
+  UPDATE_PROFILE_SUCCESS,
+  UPDATE_PROFILE_ERROR,
+  UPDATE_PROFILE_RESET,
 } from './../constants/userConstants';
 
 export const authReducer = (state = { user: {} }, action) => {
@@ -57,6 +61,36 @@ export const authReducer = (state = { user: {} }, action) => {
       return {
         ...state,
         error: null,
+      };
+
+    default:
+      return state;
+  }
+};
+
+export const updateUserReducer = (state = {}, action) => {
+  switch (action.type) {
+    case UPDATE_PROFILE_REQUEST:
+      return {
+        ...state,
+        loading: true,
+      };
+    case UPDATE_PROFILE_SUCCESS:
+      return {
+        ...state,
+        success: action.payload,
+        loading: false,
+      };
+    case UPDATE_PROFILE_ERROR:
+      return {
+        ...state,
+        error: action.payload,
+        loading: false,
+      };
+    case UPDATE_PROFILE_RESET:
+      return {
+        ...state,
+        success: false,
       };
 
     default:

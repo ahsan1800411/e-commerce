@@ -6,11 +6,15 @@ import {
   REGISTER_SUCCESS,
   REGISTER_ERROR,
   REGISTER_REQUEST,
-  LOAD_ERROR,
   LOAD_REQUEST,
   LOAD_SUCCESS,
-  LOGOUT_ERROR,
+  LOAD_ERROR,
   LOGOUT_SUCCESS,
+  LOGOUT_ERROR,
+  UPDATE_PROFILE_REQUEST,
+  UPDATE_PROFILE_SUCCESS,
+  UPDATE_PROFILE_ERROR,
+  UPDATE_PROFILE_RESET,
 } from './../constants/userConstants';
 import axios from 'axios';
 
@@ -67,6 +71,25 @@ export const logoutUser = () => async (dispatch) => {
     dispatch({ type: LOGOUT_SUCCESS });
   } catch (error) {
     dispatch({ type: LOGOUT_ERROR, payload: error.response.data.message });
+  }
+};
+
+export const updateUser = (userData) => async (dispatch) => {
+  try {
+    dispatch({ type: UPDATE_PROFILE_REQUEST });
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    const { data } = await axios.put('/api/v1/me/update', userData, config);
+    console.log(data);
+    dispatch({ type: UPDATE_PROFILE_SUCCESS, payload: data.success });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_PROFILE_ERROR,
+      payload: error.response.data.message,
+    });
   }
 };
 
