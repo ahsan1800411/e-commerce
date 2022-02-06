@@ -15,6 +15,13 @@ import {
   UPDATE_PROFILE_SUCCESS,
   UPDATE_PROFILE_ERROR,
   UPDATE_PROFILE_RESET,
+  UPDATE_PASSWORD_REQUEST,
+  UPDATE_PASSWORD_SUCCESS,
+  UPDATE_PASSWORD_RESET,
+  UPDATE_PASSWORD_ERROR,
+  FORGOT_PASSWORD_REQUEST,
+  FORGOT_PASSWORD_SUCCESS,
+  FORGOT_PASSWORD_ERROR,
 } from './../constants/userConstants';
 
 export const authReducer = (state = { user: {} }, action) => {
@@ -71,26 +78,56 @@ export const authReducer = (state = { user: {} }, action) => {
 export const updateUserReducer = (state = {}, action) => {
   switch (action.type) {
     case UPDATE_PROFILE_REQUEST:
+    case UPDATE_PASSWORD_REQUEST:
       return {
         ...state,
         loading: true,
       };
     case UPDATE_PROFILE_SUCCESS:
+    case UPDATE_PASSWORD_SUCCESS:
       return {
         ...state,
         success: action.payload,
         loading: false,
       };
     case UPDATE_PROFILE_ERROR:
+    case UPDATE_PASSWORD_ERROR:
       return {
         ...state,
         error: action.payload,
         loading: false,
       };
     case UPDATE_PROFILE_RESET:
+    case UPDATE_PASSWORD_RESET:
       return {
         ...state,
         success: false,
+      };
+
+    default:
+      return state;
+  }
+};
+
+export const forgotPasswordReducer = (state = {}, action) => {
+  switch (action.type) {
+    case FORGOT_PASSWORD_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case FORGOT_PASSWORD_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        message: action.payload,
+      };
+    case FORGOT_PASSWORD_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
       };
 
     default:
