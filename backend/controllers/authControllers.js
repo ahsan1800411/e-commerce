@@ -76,9 +76,11 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   // create password url;
 
-  const resetUrl = `${req.protocol}://${req.get(
-    'host'
-  )}/api/v1/password/reset/${resetToken}`;
+  // const resetUrl = `${req.protocol}://${req.get(
+  //   'host'
+  // )}/api/v1/password/reset/${resetToken}`;
+
+  const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
 
   const message = `Your password reset token is as follows: \n\n${resetUrl} \n\n If you have not requested this email please ignore it.`;
 
@@ -114,7 +116,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     resetPasswordToken,
     // resetPasswordExpire: { $gt: Date.now() },
   });
-  console.log(user);
+
   if (!user) {
     return next(
       new ErrorHandler(

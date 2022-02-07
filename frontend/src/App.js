@@ -15,6 +15,7 @@ import ErrorPage from './components/ErrorPage';
 import UpdateProfile from './components/user/UpdateProfile';
 import UpdatePassword from './components/user/UpdatePassword';
 import ForgotPassword from './components/user/ForgotPassword';
+import NewPassword from './components/user/NewPassword';
 
 function App() {
   useEffect(() => {
@@ -53,6 +54,7 @@ function App() {
               }
             />
             <Route path='/password/forgot' element={<ForgotPassword />} />
+            <Route path='/password/reset/:token' element={<NewPassword />} />
 
             <Route path='login' element={<Login />} />
             <Route path='register' element={<Register />} />
