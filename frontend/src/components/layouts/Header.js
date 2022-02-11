@@ -7,6 +7,7 @@ import { logoutUser } from '../../actions/userActions';
 const Header = () => {
   const alert = useAlert();
   const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const handleLogout = () => {
@@ -35,7 +36,7 @@ const Header = () => {
           </span>
 
           <span className='ml-1' id='cart_count'>
-            2
+            {cartItems.length}
           </span>
         </Link>
         {user ? (
