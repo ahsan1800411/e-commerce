@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useAlert } from 'react-alert';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Loader from './../layouts/Loader';
 import MetaData from './../layouts/MetaData';
 import { login, clearErrors } from '../../actions/userActions';
@@ -15,15 +15,20 @@ const Login = () => {
   const { loading, error, isAuthenticated } = useSelector(
     (state) => state.auth
   );
+
+  const location = useLocation();
+
+  const redirect = location.search ? location.search.split('=')[1] : '/';
+
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate(redirect);
     }
     if (error) {
       alert.error(error);
       dispatch(clearErrors());
     }
-  }, [error, alert, isAuthenticated, navigate, dispatch]);
+  }, [error, alert, isAuthenticated, navigate, dispatch, redirect]);
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(login(email, password));
