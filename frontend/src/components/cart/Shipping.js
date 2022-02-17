@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { saveShippingInfo } from '../../actions/cartActions';
 import MetaData from '../layouts/MetaData';
 import { countries } from 'countries-list';
+import CheckoutSteps from './CheckoutSteps';
 
 const Shipping = () => {
   const { shippingInfo } = useSelector((state) => state.cart);
@@ -23,12 +24,13 @@ const Shipping = () => {
     e.preventDefault();
 
     dispatch(saveShippingInfo({ address, city, postalCode, phoneNo, country }));
-    navigate('/confirm');
+    navigate('/order/confirm');
   };
 
   return (
     <>
       <MetaData title={'Shipping Info'} />
+      <CheckoutSteps shipping />
       <div className='row wrapper'>
         <div className='col-10 col-lg-5'>
           <form className='shadow-lg' onSubmit={submitHandler}>
