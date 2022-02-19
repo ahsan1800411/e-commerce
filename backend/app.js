@@ -6,6 +6,7 @@ const app = express();
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
 
 const errorMiddleware = require('./middlewares/errors');
 
@@ -19,6 +20,7 @@ app.use(fileUpload());
 app.use('/api/v1', productRoutes);
 app.use('/api/v1', authRoutes);
 app.use('/api/v1', orderRoutes);
+app.use('/api/v1', paymentRoutes);
 
 // middlewares;
 

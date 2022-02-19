@@ -7,7 +7,7 @@ import ProductDetails from './components/layouts/product/productDetails';
 import Login from './components/user/Login';
 import Register from './components/user/Register';
 import store from './store';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { loadUser } from './actions/userActions';
 import Profile from './components/user/Profile';
 import ProtectedRoutes from './components/route/ProtectedRoutes';
@@ -19,10 +19,22 @@ import NewPassword from './components/user/NewPassword';
 import Cart from './components/cart/Cart';
 import Shipping from './components/cart/Shipping';
 import ConfirmOrder from './components/cart/ConfirmOrder';
+import axios from 'axios';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import Payment from './components/cart/Payment';
 
 function App() {
+  const [stripeApiKey, setStripeApiKey] = useState('');
   useEffect(() => {
     store.dispatch(loadUser());
+
+    async function getStripeApiKey() {
+      const { data } = await axios('/api/v1/stripeapi');
+      setStripeApiKey(data.stripeApiKey);
+    }
+
+    getStripeApiKey();
   }, []);
 
   return (
@@ -74,6 +86,19 @@ function App() {
                 </ProtectedRoutes>
               }
             />
+            {stripeApiKey && (
+              <Route
+                path='/payment'
+                element={
+                  <Elements stripe={loadStripe(stripeApiKey)}>
+                    <ProtectedRoutes>
+                      <Payment />
+                    </ProtectedRoutes>
+                  </Elements>
+                }
+              />
+            )}
+
             <Route path='/password/forgot' element={<ForgotPassword />} />
             <Route path='/password/reset/:token' element={<NewPassword />} />
 
