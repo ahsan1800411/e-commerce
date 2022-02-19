@@ -18,7 +18,9 @@ const options = {
     base: {
       fontSize: '16px',
     },
-    invalid: '#9e2146',
+    invalid: {
+      color: '#9e2146',
+    },
   },
 };
 
@@ -52,7 +54,7 @@ const Payment = () => {
 
             <div className='form-group'>
               <label htmlFor='card_exp_field'>Card Expiry</label>
-              <CardNumberElement
+              <CardExpiryElement
                 type='text'
                 id='card_exp_field'
                 className='form-control'
@@ -62,7 +64,7 @@ const Payment = () => {
 
             <div className='form-group'>
               <label htmlFor='card_cvc_field'>Card CVC</label>
-              <CardNumberElement
+              <CardCvcElement
                 type='text'
                 id='card_cvc_field'
                 className='form-control'
