@@ -1,3 +1,4 @@
+require('dotenv').config({ path: 'backend/config/config.env' });
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');

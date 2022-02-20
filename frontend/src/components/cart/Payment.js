@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
+import { useAlert } from 'react-alert';
 
 import MetaData from '../layouts/MetaData';
 
@@ -25,13 +28,66 @@ const options = {
 };
 
 const Payment = () => {
+  const navigate = useNavigate();
+  const alert = useAlert();
   const stripe = useStripe();
   const elements = useElements();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  const { shippingInfo, cartItems } = useSelector((state) => state.cart);
+  // const { shippingInfo, cartItems } = useSelector((state) => state.cart);
+
+  const orderInfo = JSON.parse(sessionStorage.getItem('orderItems'));
+
+  const paymentData = {
+    amount: Math.round(orderInfo.totalPrice * 100),
+  };
 
   useEffect(() => {}, []);
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    document.querySelector('#pay_btn').disabled = true;
+
+    let res;
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+
+      res = await axios.post('/api/v1/payment/process', paymentData, config);
+
+      const client_secret = res.data.client_secret;
+      if (!stripe || !elements) {
+        return;
+      }
+      const result = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: elements.getElement(CardNumberElement),
+          billing_details: {
+            name: user.name,
+            email: user.email,
+          },
+        },
+      });
+
+      if (result.error) {
+        alert(result.error.message);
+        document.querySelector('#pay_btn').disabled = false;
+      } else {
+        if (result.paymentIntent.status === 'succeeded') {
+          // Todo new order;
+          navigate('/success');
+        } else {
+          alert.error('There is some problem with your payment');
+        }
+      }
+    } catch (error) {
+      document.querySelector('#pay_btn').disabled = false;
+      alert.error(error.response.data.message);
+    }
+  };
 
   return (
     <>
@@ -40,7 +96,7 @@ const Payment = () => {
 
       <div className='row wrapper'>
         <div className='col-10 col-lg-5'>
-          <form className='shadow-lg'>
+          <form className='shadow-lg' onSubmit={submitHandler}>
             <h1 className='mb-4'>Card Info</h1>
             <div className='form-group'>
               <label htmlFor='card_num_field'>Card Number</label>
@@ -73,7 +129,7 @@ const Payment = () => {
             </div>
 
             <button id='pay_btn' type='submit' className='btn btn-block py-3'>
-              Pay
+              Pay -${`${orderInfo && orderInfo.totalPrice}`}
             </button>
           </form>
         </div>

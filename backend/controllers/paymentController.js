@@ -7,12 +7,13 @@ exports.processPayment = catchAsyncErrors(async (req, res, next) => {
     amount: req.body.amount,
     currency: 'usd',
     metadata: {
-      integration_check: accept_a_payment,
+      integration_check: 'accept_a_payment',
     },
   });
+
   res.status(200).json({
     success: true,
-    client_Secret: paymentIntent.client_Secret,
+    client_secret: paymentIntent.client_secret,
   });
 });
 
