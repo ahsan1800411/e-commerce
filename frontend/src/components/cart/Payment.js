@@ -2,11 +2,8 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import { useAlert } from 'react-alert';
-
 import MetaData from '../layouts/MetaData';
-
 import CheckoutSteps from './CheckoutSteps';
 import {
   useStripe,
@@ -15,6 +12,7 @@ import {
   CardExpiryElement,
   CardCvcElement,
 } from '@stripe/react-stripe-js';
+import { clearErrors, createOrder } from '../../actions/orderActions';
 
 const options = {
   style: {
@@ -32,17 +30,35 @@ const Payment = () => {
   const alert = useAlert();
   const stripe = useStripe();
   const elements = useElements();
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
-  // const { shippingInfo, cartItems } = useSelector((state) => state.cart);
+  const { shippingInfo, cartItems } = useSelector((state) => state.cart);
+  const { error } = useSelector((state) => state.newOrder);
+
+  const order = {
+    orderItems: cartItems,
+    shippingInfo,
+  };
 
   const orderInfo = JSON.parse(sessionStorage.getItem('orderItems'));
+
+  if (orderInfo) {
+    order.itemsPrice = orderInfo.itemsPrice;
+    order.shippingPrice = orderInfo.shippingPrice;
+    order.taxPrice = orderInfo.taxPrice;
+    order.totalPrice = orderInfo.totalPrice;
+  }
 
   const paymentData = {
     amount: Math.round(orderInfo.totalPrice * 100),
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    if (error) {
+      alert.error(error);
+      dispatch(clearErrors());
+    }
+  }, [alert, dispatch, error]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -77,7 +93,11 @@ const Payment = () => {
         document.querySelector('#pay_btn').disabled = false;
       } else {
         if (result.paymentIntent.status === 'succeeded') {
-          // Todo new order;
+          order.paymentInfo = {
+            id: result.paymentIntent.id,
+            status: result.paymentIntent.status,
+          };
+          dispatch(createOrder(order));
           navigate('/success');
         } else {
           alert.error('There is some problem with your payment');
