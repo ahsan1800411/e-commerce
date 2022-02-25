@@ -25,6 +25,7 @@ import { Elements } from '@stripe/react-stripe-js';
 import Payment from './components/cart/Payment';
 import OrderSuccess from './components/cart/OrderSuccess';
 import OrderList from './components/order/OrderList';
+import OrderDetails from './components/order/OrderDetails';
 
 function App() {
   const [stripeApiKey, setStripeApiKey] = useState('');
@@ -101,6 +102,14 @@ function App() {
               element={
                 <ProtectedRoutes>
                   <OrderList />
+                </ProtectedRoutes>
+              }
+            />
+            <Route
+              path='/order/:id'
+              element={
+                <ProtectedRoutes>
+                  <OrderDetails />
                 </ProtectedRoutes>
               }
             />
